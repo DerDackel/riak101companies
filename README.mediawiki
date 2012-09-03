@@ -111,6 +111,12 @@ Afterwards, total and cut can be run using the respective [[Language:Python]] sc
 $ python total.py
 </syntaxhighlight>
 
+Enabling web admin UI
+
+If you install riak on MacOS, the app.config is located 
+/usr/local/Cellar/riak/RIAK_VERSION/libexec/etc/app.config
+Use the following guide to enable riak_control: http://wiki.basho.com/Riak-Control.html
+
 == Contributors ==
 
 * {{101contributor|Sebastian Jackel|developer}}
