@@ -1,0 +1,118 @@
+'''This is an implementation in the 101companies software corpus.'''
+
+== Intent ==
+
+Show the use of a key-value store to implement the features of 101companies
+
+== Motivation ==
+
+In this implementation, the principles of a [[Technology:Key-value database]] are demonstrated, using [[Technology:Riak]]. Here, entries are stored as a key-value pair inside buckets, Riak's rough equivalent to database tables. Unlike [[Technology:Document-oriented database|document-oriented databases]], which rely on the stored contents to some specified format, any form of data, including raw binaries may be stored under a key in Riak. This implementation exercises Riak's [[REST]]ful API for all database operations. This example also shows Links, a feature of Riak which provides unidirectional connections between entries. These can be used to traverse along linked entries, similar to a graph structure.
+
+== Technologies ==
+
+* [[Technology:Riak]]
+* [[Technology:Data aggregation]]
+
+== Languages ==
+
+* [[Language:JavaScript]]
+
+== Features ==
+
+* [[101feature:Tree structure]]
+
+* [[101feature:Type-driven query]]
+
+* [[101feature:Type-driven transformation]]
+
+== Illustration ==
+
+As on a Riak cluster entries are placed as key-value pairs inside buckets, two of those are used to store the company's departments and employees separately. All entries are stored in JSON format because it is simple and easy to process. To model the relationships between entities within the company, Riak's Links are used.
+
+Each link may bear a tag, specifying the relationship between the associated entries. To signal that a person is employed in a certain department, a link with the tag "employs" is constructed from the department to the employee. Links with the tag "has_subunit" order departments inside the comapny hierarchy.
+Finally, managers have their departments linked to them with the "manages" tag.
+
+An example employee entry looks like this:
+
+<syntaxhighlight lang="javascript">
+{
+        "name": "Erik",
+        "salary": 12345,
+        "address": {
+                   "city": "Utrecht",
+                   "country": "Netherlands"
+        }
+}
+</syntaxhighlight>
+
+Departments just have their name stored as most of the information on them is contained in links:
+
+<syntaxhighlight lang="javascript">
+{
+        "name": "Dev1.1"
+}
+</syntaxhighlight>
+
+An entry's links can be queried from the command line as shown in this example:
+
+<syntaxhighlight lang="bash">
+$ curl -i -X GET http://localhost:8091/riak/meganalysis_depts/81dc59ccc39811e1b9fec82a1406cf1c/_,_,_
+</syntaxhighlight>
+
+This will return an HTTP multipart reply containing data on all links:
+
+<syntaxhighlight lang="bash">
+HTTP/1.1 200 OK
+Server: MochiWeb/1.1 WebMachine/1.9.0 (someone had painted it blue)
+Expires: Fri, 13 Jul 2012 21:36:38 GMT
+Date: Fri, 13 Jul 2012 21:26:38 GMT
+Content-Type: multipart/mixed; boundary=OEfvHKHKDPF5T4mwcDpbE2GMn7t
+Content-Length: 1080
+
+
+--OEfvHKHKDPF5T4mwcDpbE2GMn7t
+Content-Type: multipart/mixed; boundary=5zb5Tf4waJl9rCfxIogzmzijDZx
+
+--5zb5Tf4waJl9rCfxIogzmzijDZx
+X-Riak-Vclock: a85hYGBgzGDKBVIcMRuuc/m/cPPIYEpkzmNl+PIj5SRfFgA=
+Location: /riak/meganalysis_employees/96e9def8c39711e1b434c82a1406cf1c
+Content-Type: application/json
+Link: </riak/meganalysis_depts/81dc59ccc39811e1b9fec82a1406cf1c>; riaktag="manages", </riak/meganalysis_employees>; rel="up"
+Etag: 5k3mZb28ezn9WTw56Hzixg
+Last-Modified: Sun, 01 Jul 2012 16:38:12 GMT
+
+{"salary": 2345, "name": "Karl", "address": {"city": "Riga", "country": "Latvia"}}
+--5zb5Tf4waJl9rCfxIogzmzijDZx
+X-Riak-Vclock: a85hYGBgzGDKBVIcR4M2cvu/cLPMYEpkzmNl+PIj5SRfFgA=
+Location: /riak/meganalysis_employees/96e9dfe8c39711e18102c82a1406cf1c
+Content-Type: application/json
+Link: </riak/meganalysis_employees>; rel="up"
+Etag: 73ZqEPniZjZC748LrDrxxI
+Last-Modified: Sun, 01 Jul 2012 16:38:12 GMT
+
+{"salary": 2344, "name": "Joe", "address": {"city": "Wifi City", "country": "The Metaverse"}}
+--5zb5Tf4waJl9rCfxIogzmzijDZx--
+
+--OEfvHKHKDPF5T4mwcDpbE2GMn7t--
+</syntaxhighlight>
+
+== Usage ==
+
+With a running local Riak node under the name NODE, run the restoration script:
+
+<syntaxhighlight lang="bash">
+$ ./rebuild.sh NODE
+</syntaxhighlight>
+
+This will restore the example database from a backup.
+Afterwards, total and cut can be run using the respective [[Language:Python]] scripts:
+
+<syntaxhighlight lang="bash">
+$ python total.py
+</syntaxhighlight>
+
+== Contributors ==
+
+* {{101contributor|Sebastian Jackel|developer}}
+
+[[Category:101implementation]]
