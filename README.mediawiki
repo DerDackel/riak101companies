@@ -113,7 +113,7 @@ $ python total.py
 
 Enabling web admin UI
 
-If you install riak on MacOS, the app.config is located 
+If you install riak on OS X using Homebrew, the app.config is located
 /usr/local/Cellar/riak/RIAK_VERSION/libexec/etc/app.config
 Use the following guide to enable riak_control: http://wiki.basho.com/Riak-Control.html
 
